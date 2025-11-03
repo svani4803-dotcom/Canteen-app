@@ -1,34 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login | Canteen System</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Karmic Canteen</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f1f1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .counts {
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-  <!-- Admin Login Section -->
-  <div class="container" id="loginContainer">
-    <h2>Admin Login</h2>
-    <form id="adminLoginForm">
-      <input type="text" id="adminUser" placeholder="Enter Admin Username" required><br>
-      <input type="password" id="adminPass" placeholder="Enter Password" required><br>
-      <button type="submit">Login</button>
-    </form>
-    <p id="loginError" class="error"></p>
+  <!-- LOGIN SECTION -->
+  <div id="loginSection" class="container">
+    <h3>Admin Login</h3>
+    <input type="text" id="adminUser" placeholder="Enter Username" />
+    <input type="password" id="adminPass" placeholder="Enter Password" />
+    <button onclick="adminLogin(event)">Login</button>
   </div>
 
-  <!-- Dashboard Section (Hidden by Default) -->
-  <div class="container hidden" id="dashboardContainer">
-    <h2>Canteen Orders Report</h2>
-    <p><strong>Total Orders:</strong> <span id="totalOrders">0</span></p>
-    <p><strong>Breakfast (Yes):</strong> <span id="breakfastCount">0</span></p>
-    <p><strong>Lunch (Yes):</strong> <span id="lunchCount">0</span></p>
-    <p><strong>Snacks (Yes):</strong> <span id="snacksCount">0</span></p>
-    <button id="logoutBtn">Logout</button>
+  <!-- REPORT SECTION -->
+  <div id="reportSection" class="container hidden">
+    <h3>Canteen Order Report</h3>
+    <div class="counts">
+      <p><strong>Breakfast Orders:</strong> <span id="breakfastCount">0</span></p>
+      <p><strong>Lunch Orders:</strong> <span id="lunchCount">0</span></p>
+      <p><strong>Snacks Orders:</strong> <span id="snacksCount">0</span></p>
+    </div>
+    <button onclick="clearOrders()">Clear Orders</button>
+    <br><br>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- Link external JS -->
-  <script src="admin.js"></script>
+  <script>
+    // ✅ Admin login details
+    const ADMIN_USERNAME = "karmic";
+    const ADMIN_PASSWORD = "admin123";
+
+    // ✅ Handle admin login
+    function adminLogin(event) {
+      event.preventDefault();
+
+      const username = document.getElementById("adminUser").value.trim();
+      const password = document.getElementById("adminPass").value.trim();
+
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("reportSection").classList.remove("hidden");
+        loadOrders();
+      } else {
+        alert("❌ Invalid username or password!");
+      }
+    }
+
+    // ✅ Load canteen orders
+    function loadOrders() {
+      const orders = JSON.parse(localStorage.getItem("canteenOrders")) || [];
+      let breakfast = 0, lunch = 0, snacks = 0;
+
+      orders.forEach(order => {
+        if (order.breakfast === "yes") breakfast++;
+        if (order.lunch === "yes") lunch++;
+        if (order.snacks === "yes") snacks++;
+      });
+
+      document.getElementById("breakfastCount").textContent = breakfast;
+      document.getElementById("lunchCount").textContent = lunch;
+      document.getElementById("snacksCount").textContent = snacks;
+    }
+
+    // ✅ Clear orders
+    function clearOrders() {
+      if (confirm("Are you sure you want to clear all orders?")) {
+        localStorage.removeItem("canteenOrders");
+        loadOrders();
+      }
+    }
+
+    // ✅ Logout
+    function logout() {
+      document.getElementById("reportSection").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
+      document.getElementById("adminUser").value = "";
+      document.getElementById("adminPass").value = "";
+    }
+  </script>
 </body>
 </html>
